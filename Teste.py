@@ -3,11 +3,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-def print_weights(W1, W2):
-    print("Pesos W1:")
-    print(W1)
-    print("\nPesos W2:")
-    print(W2)
 
 def predict(X, W1, W2):
     bias = 1
@@ -16,7 +11,6 @@ def predict(X, W1, W2):
     o1b = np.insert(o1, 0, bias)
     Y = np.tanh(W2.dot(o1b))
     return Y
-
 
 # Carregar o conjunto de dados a partir de um arquivo CSV
 # Certifique-se de que o arquivo CSV possui colunas mencionadas abaixo
@@ -27,13 +21,22 @@ dataset = pd.read_csv('diabetes.csv')
 atributos = dataset[['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age']].values
 rotulos = dataset['Outcome'].values
 
+scaler = StandardScaler()
+scaler.fit(atributos)
+atributos = scaler.transform(atributos)
+
 # Configurações da rede neural
-numEpocas = 100
+numEpocas = 2000
 q = len(rotulos)
-eta = 0.01
+eta = 0.001
 m = atributos.shape[1]
-N = 4
+N = 32
 L = 1
+
+for i in range(len(rotulos)):
+    if rotulos[i] == 0:
+        rotulos[i] = -1
+#print(rotulos)
 
 # Inicia aleatoriamente as matrizes de pesos.
 W1 = np.random.random((N, m + 1))
@@ -81,9 +84,6 @@ plt.show()
 for i in range(len(rotulos)):
     exemplo_teste = atributos[i, :]
     previsao = predict(exemplo_teste, W1, W2)
-    print(f"Previsão para o exemplo {i + 1}: {previsao}")
+    print(f"Previsão para o exemplo {i + 1}: {previsao} => {rotulos[i]}")
 
-# Pergunta relacionada ao dataset
-# Exemplo: Qual é a média de idade das pessoas no conjunto de dados?
-media_idade = np.mean(atributos[:, -1])
-print(f"Média de idade no conjunto de dados: {media_idade}")
+
